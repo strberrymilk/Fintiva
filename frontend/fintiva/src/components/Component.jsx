@@ -104,7 +104,7 @@ export default function Component(){
         {/* Right side */}
         <div className="flex items-center gap-2">
           <Button asChild size="sm" className="text-sm">
-            <a href="#">Get Started</a>
+            <a href="#">Hola</a>
           </Button>
         </div>
       </div>

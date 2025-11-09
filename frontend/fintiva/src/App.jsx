@@ -3,7 +3,7 @@ import './App.css'
 import './index.css'
 import Dashboard from './pages/Dashboard'
 import Component from './components/comp-577'
-/**/ 
+import heroBackground from './assets/hero_background.jpeg'
 
 function App(){
   return (
@@ -12,8 +12,7 @@ function App(){
       <div
         className="hero min-h-screen"
         style={{
-          backgroundImage:
-            'url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)',
+          backgroundImage: `url(${heroBackground})`,
         }}
       >
         <div className="hero-overlay" />
@@ -25,10 +24,21 @@ function App(){
             <p className="mb-5">
               En Fintivami, creemos en el poder de la educación y la confianza para transformar vidas.
             </p>
-            <button className="btn btn-primary">Inciar sesión</button>
+            <button className="btn btn-primary" style={{ backgroundColor: '#E91E63', borderColor: '#E91E63' }}>Inciar sesión</button>
           </div>
         </div>
       </div>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
+      <p className="p-4">Putamadre</p>
       <p className="p-4">Putamadre</p>
     </>
   )

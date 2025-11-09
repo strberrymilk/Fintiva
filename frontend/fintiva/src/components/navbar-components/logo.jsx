@@ -1,4 +1,4 @@
-export default function Logo() {
+{/*export default function Logo() {
   return (
     <div className="flex items-center gap-2">
       <svg
@@ -18,4 +18,14 @@ export default function Logo() {
       <span className="text-xl font-bold">Fintiva</span>
     </div>
   );
+}*/}
+
+export default function Logo() {
+  return (
+    <img 
+      src="/fintiva.svg" 
+      alt="Logo Fintiva" 
+      className="h-8 w-auto"
+    />
+  )
 }
