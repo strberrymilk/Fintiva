@@ -2,11 +2,13 @@ import { useState } from 'react'
 import './App.css'
 import './index.css'
 import Dashboard from './pages/Dashboard'
+import Component from './components/comp-577'
+/**/ 
 
 function App(){
   return (
     <>
-      {/*
+      <Component/>
       <div
         className="hero min-h-screen"
         style={{
@@ -16,19 +18,18 @@ function App(){
       >
         <div className="hero-overlay" />
         <div className="hero-content text-neutral-content text-center">
-          <div className="max-w-md">
-            <h1 className="mb-5 text-5xl font-bold">Hello there</h1>
+          <div className="max-w-3xl">
+            <h1 className="mb-2 text-5xl font-bold">Sembramos educación</h1>
+            <h1 className="mb-2 text-5xl font-bold">Cultivamos confianza</h1>
+            <h1 className="mb-5 text-5xl font-bold">Cosechamos bienestar</h1>
             <p className="mb-5">
-              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.
+              En Fintivami, creemos en el poder de la educación y la confianza para transformar vidas.
             </p>
-            <button className="btn btn-primary">Get Started</button>
+            <button className="btn btn-primary">Inciar sesión</button>
           </div>
         </div>
       </div>
-      <p className="p-4">Holaaa</p>
-      */}
-
-      <Dashboard />
+      <p className="p-4">Putamadre</p>
     </>
   )
 }

@@ -25,18 +25,18 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import Sprout from "@/components/Sprout";
+import Apple from "@/components/Apple";
 
 const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, href: "#dashboard" },
-  { title: "Analytics", icon: BarChart3, href: "#analytics" },
-  { title: "Users", icon: Users, href: "#users" },
-  { title: "Content", icon: FileText, href: "#content" },
-  { title: "Activity", icon: Activity, href: "#activity" },
-  { title: "Database", icon: Database, href: "#database" },
-  { title: "Security", icon: Shield, href: "#security" },
-  { title: "Performance", icon: Zap, href: "#performance" },
-  { title: "Notifications", icon: Bell, href: "#notifications" },
-  { title: "Settings", icon: Settings, href: "#settings" },
+  { title: "Tablero", icon: LayoutDashboard, href: "#dashboard" },
+  { title: "Analíticas", icon: BarChart3, href: "#analytics" },
+  { title: "Fintivadores", icon: Users, href: "#users" },
+  { title: "Parcelas", icon: Sprout, href: "#content" },
+  { title: "Cultivos", icon: Apple, href: "#activity" },
+  { title: "Gastos", icon: Database, href: "#database" },
+  { title: "Notificaciones", icon: Bell, href: "#notifications" },
+  { title: "Configuración", icon: Settings, href: "#settings" },
 ];
 
 export const AdminSidebar = memo(() => {
@@ -51,8 +51,8 @@ export const AdminSidebar = memo(() => {
                   <LayoutDashboard className="h-5 w-5" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">TechCorp</span>
-                  <span className="truncate text-xs">Admin Panel</span>
+                  <span className="truncate font-semibold">José</span>
+                  <span className="truncate text-xs"></span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -62,7 +62,7 @@ export const AdminSidebar = memo(() => {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>Navegación</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
@@ -89,7 +89,7 @@ export const AdminSidebar = memo(() => {
             <SidebarMenuButton asChild>
               <a href="#profile">
                 <User />
-                <span>Admin Profile</span>
+                <span>Perfil</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

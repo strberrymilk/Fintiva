@@ -31,7 +31,7 @@ const activities = [
     color: "text-purple-500",
   },
 ];
-export const RecentActivity = memo(() => {
+export const RecentActivityAdmin = memo(() => {
   return (
     <div className="border-border bg-card/40 rounded-xl border p-6">
       <h3 className="mb-4 text-xl font-semibold">Recent Activity</h3>
@@ -64,4 +64,4 @@ export const RecentActivity = memo(() => {
     </div>
   );
 });
-RecentActivity.displayName = "RecentActivity";
+RecentActivityAdmin.displayName = "RecentActivityAdmin";

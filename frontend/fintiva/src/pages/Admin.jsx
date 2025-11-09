@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Users, Activity, DollarSign, Eye } from 'lucide-react';
-import { DashboardCard } from '@/components/ui/dashboard-card';
-import { RevenueChart } from '@/components/ui/revenue-chart';
-import { UsersTable } from '@/components/ui/users-table';
-import { QuickActions } from '@/components/ui/quick-actions';
-import { SystemStatus } from '@/components/ui/system-status';
-import { RecentActivity } from '@/components/ui/recent-activity';
-import { DashboardHeader } from '@/components/ui/dashboard-header';
+import { DashboardCardAdmin } from '@/components/ui/dashboard-card_admin';
+import { RevenueChartAdmin } from '@/components/ui/revenue-chart_admin';
+import { UsersTableAdmin } from '@/components/ui/users-table_admin';
+import { QuickActionsAdmin } from '@/components/ui/quick-actions_admin';
+import { SystemStatusAdmin } from '@/components/ui/system-status_admin';
+import { RecentActivityAdmin } from '@/components/ui/recent-activity_admin';
+import { DashboardHeaderAdmin } from '@/components/ui/dashboard-header_admin';
 import { AdminSidebar } from '@/components/ui/admin-sidebar';
 
 const stats = [
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
-        <DashboardHeader
+        <DashboardHeaderAdmin
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onRefresh={handleRefresh}
@@ -84,17 +84,17 @@ export default function AdminDashboard() {
             <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
               <div className="px-2 sm:px-0">
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  ¡Bienvenido de nuevo, ! 
+                  Welcome Admin
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Frase.
+                  Here&apos;s what&apos;s happening with your platform today.
                 </p>
               </div>
 
               {/* Stats Cards */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
                 {stats.map((stat, index) => (
-                  <DashboardCard key={stat.title} stat={stat} index={index} />
+                  <DashboardCardAdmin key={stat.title} stat={stat} index={index} />
                 ))}
               </div>
 
@@ -102,18 +102,18 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
                 {/* Charts Section */}
                 <div className="space-y-4 sm:space-y-6 xl:col-span-2">
-                  <RevenueChart />
-                  <UsersTable onAddUser={handleAddUser} />
+                  <RevenueChartAdmin />
+                  <UsersTableAdmin onAddUser={handleAddUser} />
                 </div>
 
                 {/* Sidebar Section */}
                 <div className="space-y-4 sm:space-y-6">
-                  <QuickActions
+                  <QuickActionsAdmin
                     onAddUser={handleAddUser}
                     onExport={handleExport}
                   />
-                  <SystemStatus />
-                  <RecentActivity />
+                  <SystemStatusAdmin />
+                  <RecentActivityAdmin />
                 </div>
               </div>
             </div>

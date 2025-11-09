@@ -41,7 +41,7 @@ const users = [
     location: "London, UK",
   },
 ];
-export const UsersTable = memo(({ onAddUser }) => {
+export const UsersTableAdmin = memo(({ onAddUser }) => {
   return (
     <div className="border-border bg-card/40 rounded-xl border p-3 sm:p-6">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -129,4 +129,4 @@ export const UsersTable = memo(({ onAddUser }) => {
     </div>
   );
 });
-UsersTable.displayName = "UsersTable";
+UsersTableAdmin.displayName = "UsersTableAdmin";

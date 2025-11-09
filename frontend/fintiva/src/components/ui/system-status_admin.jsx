@@ -31,7 +31,7 @@ const statusItems = [
     percentage: 85,
   },
 ];
-export const SystemStatus = memo(() => {
+export const SystemStatusAdmin = memo(() => {
   return (
     <div className="border-border bg-card/40 rounded-xl border p-6">
       <h3 className="mb-4 text-xl font-semibold">System Status</h3>
@@ -70,4 +70,4 @@ export const SystemStatus = memo(() => {
     </div>
   );
 });
-SystemStatus.displayName = "SystemStatus";
+SystemStatusAdmin.displayName = "SystemStatusAdmin";

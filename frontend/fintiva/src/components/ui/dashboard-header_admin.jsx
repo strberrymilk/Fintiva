@@ -24,17 +24,17 @@ import {
   RefreshCw,
   MoreHorizontal,
 } from "lucide-react";
-export const DashboardHeader = memo(
+export const DashboardHeaderAdmin = memo(
   ({ searchQuery, onSearchChange, onRefresh, onExport, isRefreshing }) => {
     return (
       <header className="bg-background/95 sticky top-0 z-50 flex h-16 w-full shrink-0 items-center gap-2 border-b backdrop-blur transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1 hover:bg-[var(--accent)]" />
+          <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">Inicio</BreadcrumbLink>
+                <BreadcrumbLink href="#">Home</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -49,7 +49,7 @@ export const DashboardHeader = memo(
             <div className="relative hidden md:block">
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
-                placeholder="Buscar..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="w-64 pl-10"
@@ -58,57 +58,56 @@ export const DashboardHeader = memo(
 
             {/* Desktop Actions */}
             <div className="hidden items-center gap-2 md:flex">
-              <Button variant="outline" size="sm" className="hover:bg-[var(--accent)]">
+              <Button variant="outline" size="sm">
                 <Filter className="mr-2 h-4 w-4" />
-                Filtrar
+                Filter
               </Button>
 
-              <Button variant="outline" size="sm" onClick={onExport} className="hover:bg-[var(--accent)]">
+              <Button variant="outline" size="sm" onClick={onExport}>
                 <Download className="mr-2 h-4 w-4" />
-                Exportar
+                Export
               </Button>
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={onRefresh}
-                disabled={isRefreshing}
-                className="hover:bg-[var(--accent)]">
+                disabled={isRefreshing}>
                 <RefreshCw
                   className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
                 />
-                Refrescar
+                Refresh
               </Button>
             </div>
 
             {/* Mobile Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="md:hidden">
-                <Button variant="outline" size="icon" className="hover:bg-[var(--accent)]">
+                <Button variant="outline" size="icon">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => onSearchChange("")}>
                   <Search className="mr-2 h-4 w-4" />
-                  Buscar
+                  Search
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Filter className="mr-2 h-4 w-4" />
-                  Filtrar
+                  Filter
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onExport}>
                   <Download className="mr-2 h-4 w-4" />
-                  Exportar
+                  Export
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onRefresh}>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Refrescar
+                  Refresh
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button variant="outline" size="sm" className="hover:bg-[var(--accent)]">
+            <Button variant="outline" size="sm">
               <Bell className="h-4 w-4" />
             </Button>
           </motion.div>
@@ -117,4 +116,4 @@ export const DashboardHeader = memo(
     );
   },
 );
-DashboardHeader.displayName = "DashboardHeader";
+DashboardHeaderAdmin.displayName = "DashboardHeaderAdmin";
