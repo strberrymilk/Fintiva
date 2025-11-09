@@ -14,7 +14,7 @@ export default function Login() {
     setErrorMsg('');
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/auth/login', {
+      const res = await fetch('https://fintiva-backend.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identificador, contrasena }), // texto plano
