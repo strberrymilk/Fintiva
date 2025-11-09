@@ -14,9 +14,9 @@ import {
 
 const navigationLinks = [
   { href: "#", label: "Inicio", active: true },
-  { href: "#", label: "Nosotros" },
-  { href: "#", label: "Objetivo" },
-  { href: "#", label: "FAQ" },
+  { href: "#nosotros", label: "Nosotros" },
+  { href: "#objetivo", label: "Objetivo" },
+  { href: "#faq", label: "FAQ" },
 ]
 
 export default function Component() {

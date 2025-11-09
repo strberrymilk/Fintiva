@@ -1,5 +1,3 @@
-
-
 import { useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Users, Activity, DollarSign, Eye } from 'lucide-react';
@@ -89,7 +87,7 @@ export default function Dashboard() {
                   ¡Bienvenido de nuevo, ! 
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  No esperes a que las oportunidades lleguen, créalas con cada paso que das.
+                  Frase.
                 </p>
               </div>
 
