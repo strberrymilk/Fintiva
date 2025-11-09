@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import Sprout from "@/components/Sprout";
 import Apple from "@/components/Apple";
+import BanknoteArrowDown from "@/components/BanknoteArrowDown";
 
 const menuItems = [
   { title: "Tablero", icon: LayoutDashboard, href: "#dashboard" },
@@ -34,7 +35,7 @@ const menuItems = [
   { title: "Fintivadores", icon: Users, href: "#users" },
   { title: "Parcelas", icon: Sprout, href: "#content" },
   { title: "Cultivos", icon: Apple, href: "#activity" },
-  { title: "Gastos", icon: Database, href: "#database" },
+  { title: "Gastos", icon: BanknoteArrowDown, href: "#database" },
   { title: "Notificaciones", icon: Bell, href: "#notifications" },
   { title: "Configuración", icon: Settings, href: "#settings" },
 ];

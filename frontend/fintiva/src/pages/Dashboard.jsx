@@ -89,7 +89,7 @@ export default function Dashboard() {
                   ¡Bienvenido de nuevo, ! 
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Frase.
+                  No esperes a que las oportunidades lleguen, créalas con cada paso que das.
                 </p>
               </div>
 
