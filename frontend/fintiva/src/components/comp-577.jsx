@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover"
 
 const navigationLinks = [
-  { href: "#", label: "Inicio", active: true },
+  { href: "#", label: "Inicio" },
   { href: "#nosotros", label: "Nosotros" },
   { href: "#objetivo", label: "Objetivo" },
   { href: "#faq", label: "FAQ" },

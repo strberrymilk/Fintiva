@@ -1,10 +1,32 @@
 from typing import List, Optional
 from pathlib import Path
+from datetime import datetime, timedelta
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlmodel import SQLModel, Field, Session, create_engine, select
+
+# === Seguridad (hash y JWT) ===
+from passlib.context import CryptContext
+from jose import jwt
+from pydantic import BaseModel, EmailStr
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = "CAMBIA-ESTE-VALOR-LARGO-Y-ALEATORIO"  # usa variable de entorno en prod
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
+
+def hash_password(plain: str) -> str:
+    return pwd_context.hash(plain)
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_access_token(data: dict, minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
+    to_encode = data.copy()
+    to_encode.update({"exp": datetime.utcnow() + timedelta(minutes=minutes)})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # =========================
 # MODELOS (tablas)
@@ -17,15 +39,14 @@ class Usuario(SQLModel, table=True):
     dia_nac: Optional[int] = None
     mes_nac: Optional[int] = None
     anio_nac: Optional[int] = None
-    curp: Optional[str] = Field(default=None, max_length=18)
-    telefono: Optional[str] = None
+    curp: Optional[str] = Field(default=None, max_length=18, index=True)
+    telefono: Optional[str] = Field(default=None, index=True)
     calle: Optional[str] = None
     colonia: Optional[str] = None
     municipio: Optional[str] = None
     estado: Optional[str] = None
     persona_referenciada: Optional[str] = None
     telefono_referencia: Optional[str] = None
-
 
 class Parcela(SQLModel, table=True):
     id_parcela: Optional[int] = Field(default=None, primary_key=True)
@@ -36,7 +57,6 @@ class Parcela(SQLModel, table=True):
     tipo_tenencia: Optional[str] = None
     sistema_riego: Optional[str] = None
 
-
 class Cultivo(SQLModel, table=True):
     id_cultivo: Optional[int] = Field(default=None, primary_key=True)
     id_parcela: int = Field(foreign_key="parcela.id_parcela")
@@ -46,8 +66,6 @@ class Cultivo(SQLModel, table=True):
     produccion_anio_pasado: Optional[int] = None
     produccion_anio_antepasado: Optional[int] = None
 
-
-# Tabla definitiva de Gastos
 class Gastos(SQLModel, table=True):
     id_gastos: Optional[int] = Field(default=None, primary_key=True)
     id_usuario: int = Field(foreign_key="usuario.id_usuario")
@@ -59,10 +77,35 @@ class Gastos(SQLModel, table=True):
     gasto_mantenimiento: float = 0.0
     gasto_combustible: float = 0.0
 
+# =========================
+# Schemas (entradas/salidas)
+# =========================
+class UsuarioOut(BaseModel):
+    id_usuario: int
+    nombre_completo: str
+    curp: Optional[str] = None
+    telefono: Optional[str] = None
+    estado: Optional[str] = None
+    class Config:
+        from_attributes = True
 
-# Modelo de ENTRADA robusto para evitar 422
+class RegistrarUsuarioIn(BaseModel):
+    nombre_completo: str
+    contrasena: str
+    curp: Optional[str] = None
+    telefono: Optional[str] = None
+    estado: Optional[str] = None
+
+class LoginIn(BaseModel):
+    identificador: str  # teléfono o CURP
+    contrasena: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
 class GastosIn(SQLModel):
-    id_usuario: Optional[int] = None  # opcional aquí; el otro endpoint lo toma de la ruta
+    id_usuario: Optional[int] = None
     gasto_agua: Optional[float] = 0.0
     gasto_gas: Optional[float] = 0.0
     gasto_luz: Optional[float] = 0.0
@@ -70,7 +113,6 @@ class GastosIn(SQLModel):
     gasto_fertilizantes: Optional[float] = 0.0
     gasto_mantenimiento: Optional[float] = 0.0
     gasto_combustible: Optional[float] = 0.0
-
 
 # =========================
 # DB ENGINE / SESSION
@@ -91,7 +133,6 @@ def create_db_and_tables():
 def get_session():
     with Session(engine) as session:
         yield session
-
 
 # =========================
 # APP
@@ -115,7 +156,6 @@ def on_startup():
     print(">>> DB path:", (BASE_DIR / "db.sqlite3").resolve())
     create_db_and_tables()
 
-
 # =========================
 # ROOT & HEALTH
 # =========================
@@ -127,12 +167,54 @@ def root():
 def health():
     return {"status": "ok"}
 
+# =========================
+# AUTH (registro + login)
+# =========================
+@app.post("/auth/register", response_model=UsuarioOut, status_code=201)
+def registrar_usuario(payload: RegistrarUsuarioIn, session: Session = Depends(get_session)):
+    # Evita duplicados por teléfono o CURP si se proporcionan
+    if payload.telefono:
+        dup_tel = session.exec(select(Usuario).where(Usuario.telefono == payload.telefono)).first()
+        if dup_tel:
+            raise HTTPException(409, "Teléfono ya registrado")
+    if payload.curp:
+        dup_curp = session.exec(select(Usuario).where(Usuario.curp == payload.curp)).first()
+        if dup_curp:
+            raise HTTPException(409, "CURP ya registrada")
+
+    user = Usuario(
+        nombre_completo=payload.nombre_completo,
+        contrasena_hash=hash_password(payload.contrasena),
+        curp=payload.curp,
+        telefono=payload.telefono,
+        estado=payload.estado,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user  # pydantic lo transforma a UsuarioOut
+
+@app.post("/auth/login", response_model=TokenResponse)
+def login(payload: LoginIn, session: Session = Depends(get_session)):
+    # Buscar por teléfono o CURP
+    user = session.exec(
+        select(Usuario).where( (Usuario.telefono == payload.identificador) | (Usuario.curp == payload.identificador) )
+    ).first()
+
+    if not user or not verify_password(payload.contrasena, user.contrasena_hash):
+        # Respuesta genérica para no filtrar qué falló
+        raise HTTPException(401, "Credenciales inválidas")
+
+    token = create_access_token({"sub": str(user.id_usuario), "name": user.nombre_completo})
+    return TokenResponse(access_token=token)
 
 # =========================
-# USUARIOS
+# USUARIOS (CRUD)
 # =========================
 @app.post("/usuarios", response_model=Usuario, status_code=201)
 def crear_usuario(payload: Usuario, session: Session = Depends(get_session)):
+    # Ojo: este endpoint crea usuarios esperando contrasena_hash directamente.
+    # Para alta normal, usa /auth/register.
     session.add(payload)
     session.commit()
     session.refresh(payload)
@@ -172,6 +254,7 @@ def actualizar_usuario(
         raise HTTPException(404, "Usuario no encontrado")
     data = payload.model_dump(exclude_unset=True)
     data.pop("id_usuario", None)
+    # Si te mandan contrasena_hash nuevo (ya hasheado) se respeta.
     for k, v in data.items():
         setattr(obj, k, v)
     session.add(obj)
@@ -187,7 +270,6 @@ def borrar_usuario(id_usuario: int, session: Session = Depends(get_session)):
     session.delete(obj)
     session.commit()
     return
-
 
 # =========================
 # PARCELAS
@@ -213,7 +295,6 @@ def parcelas_de_usuario(id_usuario: int, session: Session = Depends(get_session)
     stmt = select(Parcela).where(Parcela.id_usuario == id_usuario)
     return session.exec(stmt).all()
 
-
 # =========================
 # CULTIVOS
 # =========================
@@ -238,12 +319,10 @@ def cultivos_de_parcela(id_parcela: int, session: Session = Depends(get_session)
     stmt = select(Cultivo).where(Cultivo.id_parcela == id_parcela)
     return session.exec(stmt).all()
 
-
 # =========================
 # GASTOS (dos formas)
 # =========================
 def _coerce_gastos_dict(d: dict) -> dict:
-    """Convierte strings numéricos a float y asegura 0.0 en None/errores."""
     for k in list(d.keys()):
         if k.startswith("gasto_"):
             val = d[k]
@@ -256,7 +335,6 @@ def _coerce_gastos_dict(d: dict) -> dict:
                     d[k] = 0.0
     return d
 
-# 1) Con id en el body
 @app.post("/gastos", response_model=Gastos, status_code=201)
 def crear_gastos(payload: GastosIn, session: Session = Depends(get_session)):
     print("POST /gastos payload:", payload.model_dump())
@@ -271,10 +349,9 @@ def crear_gastos(payload: GastosIn, session: Session = Depends(get_session)):
     session.refresh(obj)
     return obj
 
-# 2) Más seguro: id en la ruta
 @app.post("/usuarios/{id_usuario}/gastos", response_model=Gastos, status_code=201)
 def crear_gastos_para_usuario(id_usuario: int, payload: GastosIn, session: Session = Depends(get_session)):
-    print("POST /usuarios/%s/gastos payload:" % id_usuario, payload.model_dump())
+    print(f"POST /usuarios/{id_usuario}/gastos payload:", payload.model_dump())
     if not session.get(Usuario, id_usuario):
         raise HTTPException(400, "id_usuario inválido")
     data = _coerce_gastos_dict(payload.model_dump())
@@ -297,7 +374,6 @@ def gastos_de_usuario(id_usuario: int, session: Session = Depends(get_session)):
     stmt = select(Gastos).where(Gastos.id_usuario == id_usuario)
     return session.exec(stmt).all()
 
-
 # =========================
 # Reporte demo
 # =========================
@@ -316,5 +392,3 @@ def reporte_cultivos_por_usuario(session: Session = Depends(get_session)):
     cols = ["id_usuario","nombre_completo","id_parcela","nombre_parcela",
             "id_cultivo","tipo_cultivo","mes_siembra","mes_cosecha"]
     return [dict(zip(cols, r)) for r in rows]
-
-# Ejecuta: uvicorn main:app --reload
