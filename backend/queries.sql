@@ -10,8 +10,8 @@ VALUES (1, 'La Esperanza', '19.54,-96.91', '2.3 ha', 'propio', 'goteo');
 INSERT INTO cultivo (id_parcela, tipo_cultivo, mes_siembra, mes_cosecha, produccion_anio_pasado, produccion_anio_antepasado)
 VALUES (1, 'Maíz', 3, 9, 8, 7);
 
-INSERT INTO gastos (id_usuario, gasto_semillas, gasto_fertilizantes, periodo)
-VALUES (1, 3500, 4100, '2025Q4');
+INSERT INTO gastos (id_usuario, gasto_semillas, gasto_fertilizantes)
+VALUES (1, 3500, 4100);
 
 -- SELECTs
 SELECT * FROM usuario;

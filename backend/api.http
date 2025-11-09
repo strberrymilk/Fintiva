@@ -1,8 +1,11 @@
-### HEALTH
-GET http://127.0.0.1:8000/health
+@baseUrl = http://127.0.0.1:8000
 
-### Crear usuario
-POST http://127.0.0.1:8000/usuarios
+### HEALTH
+GET {{baseUrl}}/health
+
+### Crear usuario y capturar id
+# @name createUser
+POST {{baseUrl}}/usuarios
 Content-Type: application/json
 
 {
@@ -13,24 +16,51 @@ Content-Type: application/json
   "telefono": "228-000-0000"
 }
 
-### Listar usuarios (con búsqueda y paginación)
-GET http://127.0.0.1:8000/usuarios?q=Pérez&estado=Veracruz&skip=0&limit=50
+### Guardar id del usuario creado
+@userId = {{createUser.response.body.$.id_usuario}}
 
-### Obtener usuario por id
-GET http://127.0.0.1:8000/usuarios/1
+### Verificar usuario
+GET {{baseUrl}}/usuarios/{{userId}}
 
-### Actualizar usuario (patch)
-PATCH http://127.0.0.1:8000/usuarios/1
-Content-Type: application/json
-
-{ "telefono": "228-123-4567" }
-
-### Crear parcela (para usuario 1)
-POST http://127.0.0.1:8000/parcelas
+### Registrar gastos (forma segura: id en la ruta)
+POST {{baseUrl}}/usuarios/{{userId}}/gastos
 Content-Type: application/json
 
 {
-  "id_usuario": 1,
+  "gasto_agua": 500,
+  "gasto_gas": 300,
+  "gasto_luz": 250,
+  "gasto_semillas": 800,
+  "gasto_fertilizantes": 600,
+  "gasto_mantenimiento": 400,
+  "gasto_combustible": 200
+}
+
+### Registrar gastos (forma 2: id en el body)
+POST {{baseUrl}}/gastos
+Content-Type: application/json
+
+{
+  "id_usuario": {{userId}},
+  "gasto_agua": 500,
+  "gasto_gas": 300,
+  "gasto_luz": 250,
+  "gasto_semillas": 800,
+  "gasto_fertilizantes": 600,
+  "gasto_mantenimiento": 400,
+  "gasto_combustible": 200
+}
+
+### Ver gastos del usuario
+GET {{baseUrl}}/usuarios/{{userId}}/gastos
+
+### Crear parcela (para pruebas)
+# @name createParcela
+POST {{baseUrl}}/parcelas
+Content-Type: application/json
+
+{
+  "id_usuario": {{userId}},
   "nombre_parcela": "La Esperanza",
   "ubicacion": "19.54,-96.91",
   "tamano": "2.3 ha",
@@ -38,15 +68,15 @@ Content-Type: application/json
   "sistema_riego": "goteo"
 }
 
-### Ver parcelas de un usuario
-GET http://127.0.0.1:8000/usuarios/1/parcelas
+@parcelaId = {{createParcela.response.body.$.id_parcela}}
 
-### Crear cultivo (para parcela 1)
-POST http://127.0.0.1:8000/cultivos
+### Crear cultivo (para pruebas)
+# @name createCultivo
+POST {{baseUrl}}/cultivos
 Content-Type: application/json
 
 {
-  "id_parcela": 1,
+  "id_parcela": {{parcelaId}},
   "tipo_cultivo": "Maíz",
   "mes_siembra": 3,
   "mes_cosecha": 9,
@@ -54,22 +84,5 @@ Content-Type: application/json
   "produccion_anio_antepasado": 7
 }
 
-### Ver cultivos de una parcela
-GET http://127.0.0.1:8000/parcelas/1/cultivos
-
-### Registrar gastos del usuario 1
-POST http://127.0.0.1:8000/gastos
-Content-Type: application/json
-
-{
-  "id_usuario": 1,
-  "gasto_semillas": 3500,
-  "gasto_fertilizantes": 4100,
-  "periodo": "2025Q4"
-}
-
-### Ver gastos del usuario 1 (por periodo)
-GET http://127.0.0.1:8000/usuarios/1/gastos?periodo=2025Q4
-
-### Reporte join: cultivos por usuario
-GET http://127.0.0.1:8000/reportes/cultivos-por-usuario
+### Reporte demo
+GET {{baseUrl}}/reportes/cultivos-por-usuario

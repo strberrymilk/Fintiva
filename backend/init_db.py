@@ -24,9 +24,7 @@ CREATE TABLE IF NOT EXISTS usuario (
   municipio             VARCHAR(200),
   estado                VARCHAR(120),
   persona_referenciada  VARCHAR(200),
-  telefono_referencia   VARCHAR(30),
-  creado_en             DATETIME DEFAULT CURRENT_TIMESTAMP,
-  actualizado_en        DATETIME
+  telefono_referencia   VARCHAR(30)
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuario_curp ON usuario(curp);
@@ -68,11 +66,9 @@ CREATE TABLE IF NOT EXISTS gastos (
   gasto_semillas      REAL DEFAULT 0,
   gasto_fertilizantes REAL DEFAULT 0,
   gasto_mantenimiento REAL DEFAULT 0,
-  gasto_combustible   REAL DEFAULT 0,
-  periodo             VARCHAR(20),
+  gasto_combustible   REAL DEFAULT 0
   FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
-CREATE INDEX IF NOT EXISTS idx_gastos_usuario_periodo ON gastos(id_usuario, periodo);
 """
 
 schema_path = pathlib.Path(SCHEMA_FILE)

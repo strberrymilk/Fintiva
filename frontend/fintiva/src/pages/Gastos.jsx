@@ -103,7 +103,7 @@ export default function Dashboard() {
                     gasto_agua: parseFloat(formData.agua) || 0,
                     gasto_gas: parseFloat(formData.gas) || 0,
                     gasto_luz: parseFloat(formData.luz) || 0,
-                    gasto_mano_obra: parseFloat(formData.mano_obra) || 0,
+                    gasto_mantenimiento: parseFloat(formData.mano_obra) || 0,
                     gasto_combustible: parseFloat(formData.combustible) || 0
                 })
             });
