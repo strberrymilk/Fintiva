@@ -1,30 +1,41 @@
 @baseUrl = http://127.0.0.1:8000
 
-### HEALTH
-GET {{baseUrl}}/health
-
-### Crear usuario y capturar id
-# @name createUser
-POST {{baseUrl}}/usuarios
+########################################################
+# 1) (Opcional) Login de Oscar para obtener token JWT
+#    Si tu /auth/login aún falla, puedes omitir el token:
+#    borra la cabecera Authorization en las peticiones.
+########################################################
+# @name loginOscar
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "nombre_completo": "Juan Pérez",
-  "contrasena_hash": "hash_bcrypt_123",
-  "estado": "Veracruz",
-  "curp": "PEPJ800101HDFRRN09",
-  "telefono": "228-000-0000"
+  "identificador": "2288551538",
+  "contrasena": "hash_agricultura"
 }
 
-### Guardar id del usuario creado
-@userId = {{createUser.response.body.$.id_usuario}}
+@token = {{loginOscar.response.body.$.access_token}}
 
-### Verificar usuario
+########################################################
+# 2) Buscar a “Oscar Aguilar” y guardar su id_usuario
+########################################################
+# @name getOscar
+GET {{baseUrl}}/usuarios?q=Oscar Aguilar
+
+@userId = {{getOscar.response.body.$[0].id_usuario}}
+
+########################################################
+# 3) Verificar que el id_usuario sí existe
+########################################################
 GET {{baseUrl}}/usuarios/{{userId}}
 
-### Registrar gastos (forma segura: id en la ruta)
+########################################################
+# 4A) Registrar GASTOS para Oscar (forma recomendada: id en la ruta)
+########################################################
+# @name crearGastosRuta
 POST {{baseUrl}}/usuarios/{{userId}}/gastos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "gasto_agua": 500,
@@ -36,53 +47,35 @@ Content-Type: application/json
   "gasto_combustible": 200
 }
 
-### Registrar gastos (forma 2: id en el body)
+########################################################
+# 4B) Alternativa: Registrar GASTOS (id en el body)
+########################################################
 POST {{baseUrl}}/gastos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "id_usuario": {{userId}},
-  "gasto_agua": 500,
-  "gasto_gas": 300,
-  "gasto_luz": 250,
-  "gasto_semillas": 800,
-  "gasto_fertilizantes": 600,
-  "gasto_mantenimiento": 400,
-  "gasto_combustible": 200
+  "gasto_agua": 200,
+  "gasto_gas": 100,
+  "gasto_luz": 100,
+  "gasto_semillas": 400,
+  "gasto_fertilizantes": 300,
+  "gasto_mantenimiento": 200,
+  "gasto_combustible": 100
 }
 
-### Ver gastos del usuario
+########################################################
+# 5) Consultar los gastos de Oscar
+########################################################
 GET {{baseUrl}}/usuarios/{{userId}}/gastos
 
-### Crear parcela (para pruebas)
-# @name createParcela
-POST {{baseUrl}}/parcelas
-Content-Type: application/json
+########################################################
+# 6) (Opcional) Métrica: Gastos trimestrales de Oscar
+########################################################
+GET {{baseUrl}}/metrics/gastos-trimestrales/{{userId}}
 
-{
-  "id_usuario": {{userId}},
-  "nombre_parcela": "La Esperanza",
-  "ubicacion": "19.54,-96.91",
-  "tamano": "2.3 ha",
-  "tipo_tenencia": "propio",
-  "sistema_riego": "goteo"
-}
-
-@parcelaId = {{createParcela.response.body.$.id_parcela}}
-
-### Crear cultivo (para pruebas)
-# @name createCultivo
-POST {{baseUrl}}/cultivos
-Content-Type: application/json
-
-{
-  "id_parcela": {{parcelaId}},
-  "tipo_cultivo": "Maíz",
-  "mes_siembra": 3,
-  "mes_cosecha": 9,
-  "produccion_anio_pasado": 8,
-  "produccion_anio_antepasado": 7
-}
-
-### Reporte demo
-GET {{baseUrl}}/reportes/cultivos-por-usuario
+########################################################
+# 7) (Opcional) Métrica: Parcelas y # de cultivos (para dashboard)
+########################################################
+GET {{baseUrl}}/metrics/parcelas-cultivos/{{userId}}

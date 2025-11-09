@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [identificador, setIdentificador] = useState(''); // nombre_completo
+  const [identificador, setIdentificador] = useState(''); // Teléfono o CURP
   const [contrasena, setContrasena] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -16,14 +17,12 @@ export default function Login() {
       const res = await fetch('http://127.0.0.1:8000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identificador, contrasena }),
+        body: JSON.stringify({ identificador, contrasena }), // texto plano
       });
-
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.detail || 'Credenciales inválidas');
       }
-
       const data = await res.json();
       localStorage.setItem('token', data.access_token);
       navigate('/dashboard');
@@ -46,12 +45,12 @@ export default function Login() {
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="identificador">
-              Nombre Completo
+              Teléfono o CURP
             </label>
             <input
               id="identificador"
               type="text"
-              placeholder="Nombre Completo"
+              placeholder="2288551538 o ABCD800101HDFXXR9"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={identificador}
               onChange={(e) => setIdentificador(e.target.value)}
@@ -63,15 +62,25 @@ export default function Login() {
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Contraseña
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="********"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPwd ? 'text' : 'password'}
+                placeholder="********"
+                className="shadow appearance-none border rounded w-full py-2 px-3 pr-12 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={contrasena}
+                onChange={(e) => setContrasena(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                aria-label={showPwd ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPwd ? 'Ocultar' : 'Ver'}
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
@@ -84,7 +93,6 @@ export default function Login() {
             >
               Regresar
             </button>
-
             <button
               type="submit"
               className="px-4 py-2 rounded font-bold focus:outline-none focus:shadow-outline text-white"

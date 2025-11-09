@@ -53,7 +53,7 @@ export const AdminSidebar = memo(() => {
                   <LayoutDashboard className="h-5 w-5" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Juan Pérez</span>
+                  <span className="truncate font-semibold">Oscar Aguilar</span>
                   <span className="truncate text-xs"></span>
                 </div>
               </a>

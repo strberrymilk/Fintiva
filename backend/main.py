@@ -4,24 +4,16 @@ from datetime import datetime, timedelta
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
+from sqlalchemy import text, func, Integer, DateTime, Column
 from sqlmodel import SQLModel, Field, Session, create_engine, select
 
-# === Seguridad (hash y JWT) ===
-from passlib.context import CryptContext
+# === JWT (solo para sesiones) ===
 from jose import jwt
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "CAMBIA-ESTE-VALOR-LARGO-Y-ALEATORIO"  # usa variable de entorno en prod
+SECRET_KEY = "CAMBIA-ESTE-VALOR-LARGO-Y-ALEATORIO"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 120
-
-def hash_password(plain: str) -> str:
-    return pwd_context.hash(plain)
-
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
 
 def create_access_token(data: dict, minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
     to_encode = data.copy()
@@ -34,6 +26,7 @@ def create_access_token(data: dict, minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) 
 class Usuario(SQLModel, table=True):
     id_usuario: Optional[int] = Field(default=None, primary_key=True)
     nombre_completo: str
+    # Guardado en TEXTO PLANO por requerimiento
     contrasena_hash: str
     sociedad: Optional[str] = None
     dia_nac: Optional[int] = None
@@ -76,6 +69,11 @@ class Gastos(SQLModel, table=True):
     gasto_fertilizantes: float = 0.0
     gasto_mantenimiento: float = 0.0
     gasto_combustible: float = 0.0
+    # NUEVO: columna usada para agrupar por trimestre (mapeada al modelo)
+    creado_en: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    )
 
 # =========================
 # Schemas (entradas/salidas)
@@ -91,14 +89,14 @@ class UsuarioOut(BaseModel):
 
 class RegistrarUsuarioIn(BaseModel):
     nombre_completo: str
-    contrasena: str
+    contrasena: str                 # TEXTO PLANO
     curp: Optional[str] = None
     telefono: Optional[str] = None
     estado: Optional[str] = None
 
 class LoginIn(BaseModel):
     identificador: str  # teléfono o CURP
-    contrasena: str
+    contrasena: str     # TEXTO PLANO
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -140,8 +138,10 @@ def get_session():
 app = FastAPI(title="FINTIVA API")
 
 origins = [
-    "http://localhost:3000",
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -151,10 +151,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ÚNICA función de startup
 @app.on_event("startup")
 def on_startup():
     print(">>> DB path:", (BASE_DIR / "db.sqlite3").resolve())
     create_db_and_tables()
+    # Garantiza la columna 'creado_en' si la DB ya existía
+    with engine.connect() as conn:
+        try:
+            conn.exec_driver_sql(
+                "ALTER TABLE gastos ADD COLUMN creado_en DATETIME DEFAULT (CURRENT_TIMESTAMP);"
+            )
+        except Exception:
+            pass  # ya existe
 
 # =========================
 # ROOT & HEALTH
@@ -168,23 +177,20 @@ def health():
     return {"status": "ok"}
 
 # =========================
-# AUTH (registro + login)
+# AUTH (registro + login) – SIN HASHES
 # =========================
 @app.post("/auth/register", response_model=UsuarioOut, status_code=201)
 def registrar_usuario(payload: RegistrarUsuarioIn, session: Session = Depends(get_session)):
-    # Evita duplicados por teléfono o CURP si se proporcionan
     if payload.telefono:
-        dup_tel = session.exec(select(Usuario).where(Usuario.telefono == payload.telefono)).first()
-        if dup_tel:
+        if session.exec(select(Usuario).where(Usuario.telefono == payload.telefono)).first():
             raise HTTPException(409, "Teléfono ya registrado")
     if payload.curp:
-        dup_curp = session.exec(select(Usuario).where(Usuario.curp == payload.curp)).first()
-        if dup_curp:
+        if session.exec(select(Usuario).where(Usuario.curp == payload.curp)).first():
             raise HTTPException(409, "CURP ya registrada")
 
     user = Usuario(
         nombre_completo=payload.nombre_completo,
-        contrasena_hash=hash_password(payload.contrasena),
+        contrasena_hash=payload.contrasena,   # TEXTO PLANO
         curp=payload.curp,
         telefono=payload.telefono,
         estado=payload.estado,
@@ -192,17 +198,18 @@ def registrar_usuario(payload: RegistrarUsuarioIn, session: Session = Depends(ge
     session.add(user)
     session.commit()
     session.refresh(user)
-    return user  # pydantic lo transforma a UsuarioOut
+    return user
 
 @app.post("/auth/login", response_model=TokenResponse)
 def login(payload: LoginIn, session: Session = Depends(get_session)):
-    # Buscar por teléfono o CURP
     user = session.exec(
-        select(Usuario).where( (Usuario.telefono == payload.identificador) | (Usuario.curp == payload.identificador) )
+        select(Usuario).where(
+            (Usuario.telefono == payload.identificador) | (Usuario.curp == payload.identificador)
+        )
     ).first()
 
-    if not user or not verify_password(payload.contrasena, user.contrasena_hash):
-        # Respuesta genérica para no filtrar qué falló
+    # Comparación en TEXTO PLANO
+    if not user or (user.contrasena_hash or "") != payload.contrasena:
         raise HTTPException(401, "Credenciales inválidas")
 
     token = create_access_token({"sub": str(user.id_usuario), "name": user.nombre_completo})
@@ -213,8 +220,6 @@ def login(payload: LoginIn, session: Session = Depends(get_session)):
 # =========================
 @app.post("/usuarios", response_model=Usuario, status_code=201)
 def crear_usuario(payload: Usuario, session: Session = Depends(get_session)):
-    # Ojo: este endpoint crea usuarios esperando contrasena_hash directamente.
-    # Para alta normal, usa /auth/register.
     session.add(payload)
     session.commit()
     session.refresh(payload)
@@ -254,7 +259,6 @@ def actualizar_usuario(
         raise HTTPException(404, "Usuario no encontrado")
     data = payload.model_dump(exclude_unset=True)
     data.pop("id_usuario", None)
-    # Si te mandan contrasena_hash nuevo (ya hasheado) se respeta.
     for k, v in data.items():
         setattr(obj, k, v)
     session.add(obj)
@@ -320,7 +324,7 @@ def cultivos_de_parcela(id_parcela: int, session: Session = Depends(get_session)
     return session.exec(stmt).all()
 
 # =========================
-# GASTOS (dos formas)
+# GASTOS
 # =========================
 def _coerce_gastos_dict(d: dict) -> dict:
     for k in list(d.keys()):
@@ -337,7 +341,6 @@ def _coerce_gastos_dict(d: dict) -> dict:
 
 @app.post("/gastos", response_model=Gastos, status_code=201)
 def crear_gastos(payload: GastosIn, session: Session = Depends(get_session)):
-    print("POST /gastos payload:", payload.model_dump())
     if not payload.id_usuario:
         raise HTTPException(422, "Falta id_usuario")
     if not session.get(Usuario, payload.id_usuario):
@@ -351,7 +354,6 @@ def crear_gastos(payload: GastosIn, session: Session = Depends(get_session)):
 
 @app.post("/usuarios/{id_usuario}/gastos", response_model=Gastos, status_code=201)
 def crear_gastos_para_usuario(id_usuario: int, payload: GastosIn, session: Session = Depends(get_session)):
-    print(f"POST /usuarios/{id_usuario}/gastos payload:", payload.model_dump())
     if not session.get(Usuario, id_usuario):
         raise HTTPException(400, "id_usuario inválido")
     data = _coerce_gastos_dict(payload.model_dump())
@@ -373,6 +375,64 @@ def obtener_gasto(id_gastos: int, session: Session = Depends(get_session)):
 def gastos_de_usuario(id_usuario: int, session: Session = Depends(get_session)):
     stmt = select(Gastos).where(Gastos.id_usuario == id_usuario)
     return session.exec(stmt).all()
+
+# =========================
+# MÉTRICAS
+# =========================
+@app.get("/metrics/parcelas-cultivos/{id_usuario}")
+def parcelas_cultivos(id_usuario: int, session: Session = Depends(get_session)):
+    rows = session.exec(
+        select(
+            Parcela.id_parcela,
+            Parcela.nombre_parcela,
+            func.count(Cultivo.id_cultivo)
+        )
+        .join(Cultivo, Cultivo.id_parcela == Parcela.id_parcela, isouter=True)
+        .where(Parcela.id_usuario == id_usuario)
+        .group_by(Parcela.id_parcela, Parcela.nombre_parcela)
+        .order_by(Parcela.nombre_parcela)
+    ).all()
+
+    data = [
+        {"id_parcela": r[0], "parcela": r[1], "cultivos": int(r[2])}
+        for r in rows
+    ]
+    return {"items": data}
+
+@app.get("/metrics/gastos-trimestrales/{id_usuario}")
+def gastos_trimestrales(id_usuario: int, session: Session = Depends(get_session)):
+    total_expr = (
+        func.coalesce(Gastos.gasto_agua, 0)
+        + func.coalesce(Gastos.gasto_gas, 0)
+        + func.coalesce(Gastos.gasto_luz, 0)
+        + func.coalesce(Gastos.gasto_semillas, 0)
+        + func.coalesce(Gastos.gasto_fertilizantes, 0)
+        + func.coalesce(Gastos.gasto_mantenimiento, 0)
+        + func.coalesce(Gastos.gasto_combustible, 0)
+    )
+
+    # Q = ((mes-1)//3)+1
+    month_num = func.cast(func.strftime("%m", Gastos.creado_en), Integer)
+    q_expr = ((month_num - 1) / 3 + 1).label("q")
+
+    rows = session.exec(
+        select(
+            q_expr,
+            func.sum(total_expr).label("total")
+        )
+        .where(Gastos.id_usuario == id_usuario)
+        .group_by(q_expr)
+        .order_by(q_expr)
+    ).all()
+
+    qmap = {int(q): float(total or 0) for (q, total) in rows}
+    data = [
+        {"trimestre": "Q1", "total": qmap.get(1, 0.0)},
+        {"trimestre": "Q2", "total": qmap.get(2, 0.0)},
+        {"trimestre": "Q3", "total": qmap.get(3, 0.0)},
+        {"trimestre": "Q4", "total": qmap.get(4, 0.0)},
+    ]
+    return {"items": data}
 
 # =========================
 # Reporte demo

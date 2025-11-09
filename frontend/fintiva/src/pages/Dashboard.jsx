@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Users, Activity, DollarSign, Eye } from 'lucide-react';
+import { Users, Activity, DollarSign } from 'lucide-react';
 import { DashboardCard } from '@/components/ui/dashboard-card';
-import { RevenueChart } from '@/components/ui/revenue-chart';
 import { UsersTable } from '@/components/ui/users-table';
 import { QuickActions } from '@/components/ui/quick-actions';
 import { SystemStatus } from '@/components/ui/system-status';
@@ -10,64 +9,71 @@ import { RecentActivity } from '@/components/ui/recent-activity';
 import { DashboardHeader } from '@/components/ui/dashboard-header';
 import { AdminSidebar } from '@/components/ui/admin-sidebar';
 
+// NUEVOS imports (reemplazan RevenueChart)
+import ParcelaCultivosChart from "../components/ui/ParcelaCultivosChart.jsx";
+import GastosTrimestralesCard from "../components/ui/GastosTrimestralesCard.jsx";
+
 const stats = [
-    {
-        title: 'Total Users',
-        value: '12,345',
-        change: '+12%',
-        changeType: 'positive',
-        icon: Users,
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-500/10',
-    },
-    {
-        title: 'Revenue',
-        value: '$45,678',
-        change: '+8.2%',
-        changeType: 'positive',
-        icon: DollarSign,
-        color: 'text-green-500',
-        bgColor: 'bg-green-500/10',
-    },
-    {
-        title: 'Active Sessions',
-        value: '2,456',
-        change: '+15%',
-        changeType: 'positive',
-        icon: Activity,
-        color: 'text-purple-500',
-        bgColor: 'bg-purple-500/10',
-    },
-    {
-        title: 'Page Views',
-        value: '34,567',
-        change: '-2.4%',
-        changeType: 'negative',
-        icon: Eye,
-        color: 'text-orange-500',
-        bgColor: 'bg-orange-500/10',
-    },
+  {
+    title: 'Usuarios Totales',
+    value: '6,305',
+    change: '+12%',
+    changeType: 'positive',
+    icon: Users,
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
+  },
+  {
+    title: 'Ingresos',
+    value: '$45,678',
+    change: '+8.2%',
+    changeType: 'positive',
+    icon: DollarSign,
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+  },
+  {
+    title: 'Avance Educación Financiera',
+    value: '80%',
+    change: '+15%',
+    changeType: 'positive',
+    icon: Activity,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+  },
 ];
 
 export default function Dashboard() {
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-    const handleRefresh = async () => {
-        setIsRefreshing(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsRefreshing(false);
-    };
+  // Saca id_usuario del JWT (sub)
+  const idUsuario = useMemo(() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return Number(payload?.sub) || null;
+    } catch {
+      return null;
+    }
+  }, []);
 
-    const handleExport = () => {
-        console.log('Exporting data...');
-    };
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsRefreshing(false);
+  };
 
-    const handleAddUser = () => {
-        console.log('Adding new user...');
-    };
+  const handleExport = () => {
+    console.log('Exporting data...');
+  };
 
-    return(
+  const handleAddUser = () => {
+    console.log('Adding new user...');
+  };
+
+  return (
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
@@ -84,10 +90,10 @@ export default function Dashboard() {
             <div className="mx-auto max-w-6xl space-y-4 sm:space-y-6">
               <div className="px-2 sm:px-0">
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  ¡Bienvenido de nuevo, ! 
+                  ¡Bienvenido de nuevo Oscar Aguilar!
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  Frase.
+                  Cuando siembras tu primera inversión, cosechas la autonomía financiera.
                 </p>
               </div>
 
@@ -100,14 +106,16 @@ export default function Dashboard() {
 
               {/* Main Content Grid */}
               <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
-                {/* Charts Section */}
+                {/* IZQ: Gráficas */}
                 <div className="space-y-4 sm:space-y-6 xl:col-span-2">
-                  <RevenueChart />
+                  {/* Reemplazo de Revenue Analytics */}
+                  <ParcelaCultivosChart idUsuario={idUsuario ?? 0} />
                   <UsersTable onAddUser={handleAddUser} />
                 </div>
 
-                {/* Sidebar Section */}
+                {/* DER: Panel derecho con gastos trimestrales y demás widgets */}
                 <div className="space-y-4 sm:space-y-6">
+                  <GastosTrimestralesCard idUsuario={idUsuario ?? 0} />
                   <QuickActions
                     onAddUser={handleAddUser}
                     onExport={handleExport}

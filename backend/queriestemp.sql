@@ -1,0 +1,1 @@
+SELECT * FROM gastos WHERE id_usuario = 22;

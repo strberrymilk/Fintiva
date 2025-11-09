@@ -95,7 +95,7 @@ export default function Parcelas() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id_usuario: 1, // Cambiar por el ID del usuario logueado
+                    id_usuario: 22, // Cambiar por el ID del usuario logueado
                     nombre_parcela: formData.nombre_parcela,
                     ubicacion: formData.ubicacion,
                     tamano: parseFloat(formData.tamano) || 0,

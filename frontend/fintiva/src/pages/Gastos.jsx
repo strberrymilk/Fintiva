@@ -97,7 +97,7 @@ export default function Dashboard() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id_usuario: 1, // Cambiar por el ID del usuario logueado
+                    id_usuario: 22, // Cambiar por el ID del usuario logueado
                     gasto_semillas: parseFloat(formData.semillas) || 0,
                     gasto_fertilizantes: parseFloat(formData.fertilizantes) || 0,
                     gasto_agua: parseFloat(formData.agua) || 0,

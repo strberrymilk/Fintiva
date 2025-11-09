@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = ON;
 
 INSERT INTO usuario (id_usuario,nombre_completo, contrasena_hash, sociedad, dia_nac, mes_nac, anio_nac, curp, telefono, calle, colonia, municipio, estado, persona_referenciada, telefono_referencia)
-VALUES (1, 'Oscar Aguilar', 'hash_agricultura', 'NO', 16, 2, 1977, 'AUKC060528HVZGRSA3', '2288551538', 'Coatzacoalcos 12', 'Progreso', 'Xalapa', 'Veracruz', 'Dairen', '2288551687');
+VALUES (22, 'Oscar Aguilar', 'hash_agricultura', 'NO', 16, 2, 1977, 'AUKC060528HVZGRSA3', '2288551538', 'Coatzacoalcos 12', 'Progreso', 'Xalapa', 'Veracruz', 'Dairen', '2288551687');
 -- INSERTs
 INSERT INTO usuario (nombre_completo, contrasena_hash, estado, curp)
 VALUES ('Juan Pérez', 'hash_bcrypt_123', 'Veracruz', 'PEPJ800101HDFRRN09');

@@ -14,8 +14,8 @@ import { Input } from '@/components/ui/input';
 
 const stats = [
     {
-        title: 'Total Users',
-        value: '12,345',
+        title: 'Usuarios Totales',
+        value: '3,946,300',
         change: '+12%',
         changeType: 'positive',
         icon: Users,
@@ -23,7 +23,7 @@ const stats = [
         bgColor: 'bg-blue-500/10',
     },
     {
-        title: 'Revenue',
+        title: 'Ingresos',
         value: '$45,678',
         change: '+8.2%',
         changeType: 'positive',
@@ -32,22 +32,13 @@ const stats = [
         bgColor: 'bg-green-500/10',
     },
     {
-        title: 'Active Sessions',
-        value: '2,456',
+        title: 'Avance Educación Financiera',
+        value: '80%',
         change: '+15%',
         changeType: 'positive',
         icon: Activity,
         color: 'text-purple-500',
         bgColor: 'bg-purple-500/10',
-    },
-    {
-        title: 'Page Views',
-        value: '34,567',
-        change: '-2.4%',
-        changeType: 'negative',
-        icon: Eye,
-        color: 'text-orange-500',
-        bgColor: 'bg-orange-500/10',
     },
 ];
 
@@ -96,7 +87,7 @@ export default function Cultivos() {
                 },
                 body: JSON.stringify({
                     id_parcela: 1, // Cambiar por el ID de la parcela seleccionada
-                    id_usuario: 1, // Cambiar por el ID del usuario logueado
+                    id_usuario: 22, // Cambiar por el ID del usuario logueado
                     tipo_cultivo: formData.tipo_cultivo,
                     mes_siembra: formData.mes_siembra,
                     mes_cosecha: formData.mes_cosecha,
@@ -115,6 +106,7 @@ export default function Cultivos() {
             // Limpiar el formulario
             setFormData({
                 tipo_cultivo: '',
+                numero_parcela: '',
                 mes_siembra: '',
                 mes_cosecha: '',
                 produccion_anio_pasado: '',
@@ -157,7 +149,23 @@ export default function Cultivos() {
                     required
                   />
                 </div>
+
                 <div className="space-y-2">
+                  <label htmlFor="numero_parcela" className="text-sm font-medium">
+                    Número de Parcela
+                  </label>
+                  <Input
+                    id="numero_parcela"
+                    name="numero_parcela"
+                    type="number"
+                    placeholder="Ej: 1, 2, 3"
+                    value={formData.numero_parcela}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+
                   <label htmlFor="mes_siembra" className="text-sm font-medium">
                     Mes de Siembra
                   </label>
