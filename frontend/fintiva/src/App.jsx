@@ -3,9 +3,11 @@ import './App.css'
 import './index.css'
 import Dashboard from './pages/Dashboard'
 import Gastos from './pages/Gastos'
+import Parcelas from './pages/Parcelas'
+import Cultivos from './pages/Cultivos'
 import Component from './components/comp-577'
-import heroBackground from './assets/hero_background.jpeg'
-import middleBanner from './assets/middleBanner.png'
+import heroBackground from '@/assets/hero_background.jpeg'
+import middleBanner from '@/assets/middleBanner.png'
 import Login from './pages/Login'
 
 function HomePage() {
@@ -162,6 +164,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/gastos" element={<Gastos />} />
+        <Route path="/cultivos" element={<Cultivos />} />
+        <Route path="/parcelas" element={<Parcelas />} />
       </Routes>
     </Router>
   )
