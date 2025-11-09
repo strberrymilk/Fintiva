@@ -1,0 +1,75 @@
+### HEALTH
+GET http://127.0.0.1:8000/health
+
+### Crear usuario
+POST http://127.0.0.1:8000/usuarios
+Content-Type: application/json
+
+{
+  "nombre_completo": "Juan Pérez",
+  "contrasena_hash": "hash_bcrypt_123",
+  "estado": "Veracruz",
+  "curp": "PEPJ800101HDFRRN09",
+  "telefono": "228-000-0000"
+}
+
+### Listar usuarios (con búsqueda y paginación)
+GET http://127.0.0.1:8000/usuarios?q=Pérez&estado=Veracruz&skip=0&limit=50
+
+### Obtener usuario por id
+GET http://127.0.0.1:8000/usuarios/1
+
+### Actualizar usuario (patch)
+PATCH http://127.0.0.1:8000/usuarios/1
+Content-Type: application/json
+
+{ "telefono": "228-123-4567" }
+
+### Crear parcela (para usuario 1)
+POST http://127.0.0.1:8000/parcelas
+Content-Type: application/json
+
+{
+  "id_usuario": 1,
+  "nombre_parcela": "La Esperanza",
+  "ubicacion": "19.54,-96.91",
+  "tamano": "2.3 ha",
+  "tipo_tenencia": "propio",
+  "sistema_riego": "goteo"
+}
+
+### Ver parcelas de un usuario
+GET http://127.0.0.1:8000/usuarios/1/parcelas
+
+### Crear cultivo (para parcela 1)
+POST http://127.0.0.1:8000/cultivos
+Content-Type: application/json
+
+{
+  "id_parcela": 1,
+  "tipo_cultivo": "Maíz",
+  "mes_siembra": 3,
+  "mes_cosecha": 9,
+  "produccion_anio_pasado": 8,
+  "produccion_anio_antepasado": 7
+}
+
+### Ver cultivos de una parcela
+GET http://127.0.0.1:8000/parcelas/1/cultivos
+
+### Registrar gastos del usuario 1
+POST http://127.0.0.1:8000/gastos
+Content-Type: application/json
+
+{
+  "id_usuario": 1,
+  "gasto_semillas": 3500,
+  "gasto_fertilizantes": 4100,
+  "periodo": "2025Q4"
+}
+
+### Ver gastos del usuario 1 (por periodo)
+GET http://127.0.0.1:8000/usuarios/1/gastos?periodo=2025Q4
+
+### Reporte join: cultivos por usuario
+GET http://127.0.0.1:8000/reportes/cultivos-por-usuario
