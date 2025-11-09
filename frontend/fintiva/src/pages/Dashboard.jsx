@@ -1,3 +1,5 @@
+
+
 import { useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Users, Activity, DollarSign, Eye } from 'lucide-react';
@@ -49,7 +51,7 @@ const stats = [
     },
 ];
 
-export default function AdminDashboard() {
+export default function Dashboard() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 

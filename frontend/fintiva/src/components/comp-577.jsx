@@ -21,8 +21,8 @@ const navigationLinks = [
 
 export default function Component() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b px-4 md:px-6 bg-background">
-      <div className="flex h-16 items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b px-4 md:px-6 bg-background" style={{backgroundColor: '#ffffff'}}>
+      <div className="flex h-16 items-center justify-between gap-4" style={{ backgroundColor: '#ffffff' }}>
         {/* Left side */}
         <div className="flex items-center gap-2">
           {/* Mobile menu trigger */}
@@ -85,7 +85,7 @@ export default function Component() {
         {/* Right side */}
         <div className="flex items-center gap-2">
           <Button asChild size="sm" className="text-sm" style={{ backgroundColor: '#E91E63', borderColor: '#E91E63' }}>
-            <a href="/login">Hola</a>
+            <a href="/login">Iniciar Sesión</a>
           </Button>
         </div>
       </div>
