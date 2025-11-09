@@ -29,6 +29,7 @@ import {
 import Sprout from "@/components/Sprout";
 import Apple from "@/components/Apple";
 import BanknoteArrowDown from "@/components/BanknoteArrowDown";
+import Medal from "@/components/Medal";
 
 const menuItems = [
   { title: "Tablero", icon: LayoutDashboard, href: "/dashboard" },
@@ -37,6 +38,7 @@ const menuItems = [
   { title: "Parcelas", icon: Sprout, href: "/parcelas" },
   { title: "Cultivos", icon: Apple, href: "/cultivos" },
   { title: "Gastos", icon: BanknoteArrowDown, href: "/gastos" },
+  { title: "Logros", icon: Medal, href: "/logros" },
   { title: "Notificaciones", icon: Bell, href: "#notifications" },
   { title: "Configuración", icon: Settings, href: "#settings" },
 ];

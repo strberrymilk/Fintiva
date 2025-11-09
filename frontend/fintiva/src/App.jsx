@@ -9,6 +9,7 @@ import Component from './components/comp-577'
 import heroBackground from '@/assets/hero_background.jpeg'
 import middleBanner from '@/assets/middleBanner.png'
 import Login from './pages/Login'
+import Logros from './pages/Logros'
 
 function HomePage() {
   return (
@@ -166,6 +167,7 @@ function App() {
         <Route path="/gastos" element={<Gastos />} />
         <Route path="/cultivos" element={<Cultivos />} />
         <Route path="/parcelas" element={<Parcelas />} />
+        <Route path="/logros" element={<Logros />} />
       </Routes>
     </Router>
   )
