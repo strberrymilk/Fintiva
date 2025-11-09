@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Link } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -30,12 +31,12 @@ import Apple from "@/components/Apple";
 import BanknoteArrowDown from "@/components/BanknoteArrowDown";
 
 const menuItems = [
-  { title: "Tablero", icon: LayoutDashboard, href: "#dashboard" },
+  { title: "Tablero", icon: LayoutDashboard, href: "/dashboard" },
   { title: "Analíticas", icon: BarChart3, href: "#analytics" },
   { title: "Fintivadores", icon: Users, href: "#users" },
   { title: "Parcelas", icon: Sprout, href: "#content" },
   { title: "Cultivos", icon: Apple, href: "#activity" },
-  { title: "Gastos", icon: BanknoteArrowDown, href: "#database" },
+  { title: "Gastos", icon: BanknoteArrowDown, href: "/gastos" },
   { title: "Notificaciones", icon: Bell, href: "#notifications" },
   { title: "Configuración", icon: Settings, href: "#settings" },
 ];
@@ -71,10 +72,10 @@ export const AdminSidebar = memo(() => {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild>
-                      <a href={item.href}>
+                      <Link to={item.href}>
                         <Icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
