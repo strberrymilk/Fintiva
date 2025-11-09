@@ -86,12 +86,51 @@ export default function Dashboard() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
-        // Aquí puedes agregar la lógica para enviar los datos
-    };
+        
+        try {
+            const response = await fetch('http://127.0.0.1:8000/gastos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_usuario: 1, // Cambiar por el ID del usuario logueado
+                    gasto_semillas: parseFloat(formData.semillas) || 0,
+                    gasto_fertilizantes: parseFloat(formData.fertilizantes) || 0,
+                    gasto_agua: parseFloat(formData.agua) || 0,
+                    gasto_gas: parseFloat(formData.gas) || 0,
+                    gasto_luz: parseFloat(formData.luz) || 0,
+                    gasto_mano_obra: parseFloat(formData.mano_obra) || 0,
+                    gasto_combustible: parseFloat(formData.combustible) || 0
+                })
+            });
 
+            if (!response.ok) {
+                throw new Error('Error al registrar los gastos');
+            }
+
+            const data = await response.json();
+            console.log('Gastos registrados:', data);
+            
+            // Limpiar el formulario
+            setFormData({
+                agua: '',
+                gas: '',
+                luz: '',
+                semillas: '',
+                fertilizantes: '',
+                mano_obra: '',
+                combustible: ''
+            });
+            alert('Gastos registrados correctamente');
+        } catch (error) {
+            console.error('Error al enviar los datos:', error);
+            alert('Hubo un error al registrar los gastos');
+        }
+    };
     return(
     <SidebarProvider>
       <AdminSidebar />
@@ -105,7 +144,6 @@ export default function Dashboard() {
         />
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mt-4">Gastos</h1>
-          
           <div className="bg-background rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Registra tus gastos trimestrales</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -200,7 +238,6 @@ export default function Dashboard() {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <label htmlFor="combustible" className="text-sm font-medium">
                     Combustible

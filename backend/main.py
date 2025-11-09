@@ -52,7 +52,7 @@ class Gastos(SQLModel, table=True):
     gasto_luz: float = 0.0
     gasto_semillas: float = 0.0
     gasto_fertilizantes: float = 0.0
-    gasto_mantenimiento: float = 0.0
+    gasto_mano_obra: float = 0.0
     gasto_combustible: float = 0.0
     periodo: Optional[str] = None   # e.g. "2025Q4" o "2025-11"
 
