@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 import './index.css'
 import Dashboard from './pages/Dashboard'
+import Gastos from './pages/Gastos'
 import Component from './components/comp-577'
 import heroBackground from './assets/hero_background.jpeg'
 import middleBanner from './assets/middleBanner.png'
@@ -160,6 +161,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/gastos" element={<Gastos />} />
       </Routes>
     </Router>
   )
