@@ -6,8 +6,8 @@ import Gastos from './pages/Gastos'
 import Parcelas from './pages/Parcelas'
 import Cultivos from './pages/Cultivos'
 import Component from './components/comp-577'
-import heroBackground from './assets/hero_background.jpeg'
-import middleBanner from './assets/middleBanner.png'
+import heroBackground from '@/assets/hero_background.jpeg'
+import middleBanner from '@/assets/middleBanner.png'
 import Login from './pages/Login'
 
 function HomePage() {

@@ -20,10 +20,12 @@
   );
 }*/}
 
+import logoSvg from '@/components/navbar-components/fintiva.svg'
+
 export default function Logo() {
   return (
     <img 
-      src="/fintiva.svg" 
+      src={logoSvg} 
       alt="Logo Fintiva" 
       className="h-8 w-auto"
     />
